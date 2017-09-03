@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { fetchWeather } from '../actions/index';
 
-export default class SearchBar extends Component {
+class SearchBar extends Component {
 
   constructor(props){
     super(props);
@@ -11,6 +11,7 @@ export default class SearchBar extends Component {
 
     // take onInputChange function and bind it to this, which is SearchBar, then replace existing function with the new bound instance of the function
     this.onInputChange = this.onInputChange.bind(this);
+    this.onFormSubmit = this.onFormSubmit.bind(this);
   }
 
   onInputChange(event) {
@@ -21,7 +22,11 @@ export default class SearchBar extends Component {
   onFormSubmit(event) {
     event.preventDefault();
 
-    // we need to go and fetch weather data!
+
+    // this passes in the city as the term
+    // when user submits it calls the action creator with the term that was entered, sets state of term to empty string, causing compoentn to re-render, input has value of this.state.term which is empty string so it will appear to have emptied out to the user.
+    this.props.fetchWeather(this.state.term);
+    this.setState({ term: '' });
   }
 
   render() {
@@ -40,3 +45,10 @@ export default class SearchBar extends Component {
   }
 
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({ fetchWeather }, dispatch);
+}
+
+// passig null because this container doesn't need any state, which is typically the first argument. matching dispatch to container is always passed as second argument.
+export default connect(null, mapDispatchToProps)(SearchBar);
